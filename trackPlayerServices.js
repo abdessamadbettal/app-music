@@ -4,7 +4,9 @@ import TrackPlayer, {
     RepeatMode,
     Event
   } from 'react-native-track-player';
-  
+  import RNFS from 'react-native-fs'
+
+
   export async function setupPlayer() {
     let isSetup = false;
     try {
@@ -41,30 +43,24 @@ import TrackPlayer, {
   }
   
   export async function addTracks() {
-    await TrackPlayer.add([
-      {
-        id: '1',
-        url: require('./assets/baraka.mp3'),
-        title: 'Fluidity',
-        artist: 'tobylane',
+
+    // get music from my mobile
+    const path = `${RNFS.ExternalStorageDirectoryPath}/Mp33`;
+    const files = await RNFS.readDir(path);
+    console.log("files",files);
+    const musicList = files.map((item) => {
+      return {
+        id: item.name,
+        url: item.path,
+        title: item.name,
+        artist: 'unknown',
         duration: 60,
-      },
-      {
-        id: '2',
-        url: require('./assets/salam.mp3'),
-        title: 'Modern Chillout',
-        artist: 'penguinmusic',
-        duration: 66,
-      },
-      {
-        id: '3',
-        url: require('./assets/orhan.mp3'),
-        title: 'Powerful Beat',
-        artist: 'penguinmusic',
-        duration: 73,
       }
-    ]);
-    await TrackPlayer.setRepeatMode(RepeatMode.Queue);
+    });
+    console.log("musicList",musicList);
+    await TrackPlayer.add(musicList);
+
+    await TrackPlayer.setRepeatMode(RepeatMode.Queue); // is use for repeat the music
   }
   
   export async function playbackService() {
